@@ -169,8 +169,8 @@ function CompanyDetail() {
                 const received = billPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
                 const isExpanded = expanded === b.id;
                 return (
-                  <>
-                    <TableRow key={b.id} className="cursor-pointer" onClick={() => setExpanded(isExpanded ? null : b.id)}>
+                  <Fragment key={b.id}>
+                    <TableRow className="cursor-pointer" onClick={() => setExpanded(isExpanded ? null : b.id)}>
                       <TableCell className="font-medium">{b.billNumber || "—"}</TableCell>
                       <TableCell>{b.invoiceNumber || "—"}</TableCell>
                       <TableCell>{b.loadingDate || "—"}</TableCell>
