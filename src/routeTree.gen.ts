@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as QuotationRouteImport } from './routes/quotation'
+import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies.$companyId'
@@ -17,6 +18,11 @@ import { Route as CompaniesCompanyIdRouteImport } from './routes/companies.$comp
 const QuotationRoute = QuotationRouteImport.update({
   id: '/quotation',
   path: '/quotation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivityRoute = ActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies/': typeof CompaniesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies': typeof CompaniesIndexRoute
@@ -50,20 +58,33 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies/': typeof CompaniesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/quotation' | '/companies/$companyId' | '/companies/'
+  fullPaths:
+    | '/'
+    | '/activity'
+    | '/quotation'
+    | '/companies/$companyId'
+    | '/companies/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/quotation' | '/companies/$companyId' | '/companies'
-  id: '__root__' | '/' | '/quotation' | '/companies/$companyId' | '/companies/'
+  to: '/' | '/activity' | '/quotation' | '/companies/$companyId' | '/companies'
+  id:
+    | '__root__'
+    | '/'
+    | '/activity'
+    | '/quotation'
+    | '/companies/$companyId'
+    | '/companies/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ActivityRoute: typeof ActivityRoute
   QuotationRoute: typeof QuotationRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
@@ -76,6 +97,13 @@ declare module '@tanstack/react-router' {
       path: '/quotation'
       fullPath: '/quotation'
       preLoaderRoute: typeof QuotationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activity': {
+      id: '/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof ActivityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,6 +132,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ActivityRoute: ActivityRoute,
   QuotationRoute: QuotationRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
