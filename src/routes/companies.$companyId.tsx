@@ -58,14 +58,13 @@ function statusVariant(s: BillStatus) {
 
 function CompanyDetail() {
   const { companyId } = Route.useParams();
-  const { state, addBill, deleteBill, addPayment, deletePayment, state: s2 } = useStore();
+  const { state, addBill, deleteBill, addPayment, deletePayment } = useStore();
   const company = state.companies.find((c) => c.id === companyId);
   const [billOpen, setBillOpen] = useState(false);
   const [billForm, setBillForm] = useState(emptyBill);
   const [payOpenFor, setPayOpenFor] = useState<string | null>(null);
   const [payForm, setPayForm] = useState(emptyPayment);
   const [expanded, setExpanded] = useState<string | null>(null);
-  void s2;
 
   if (!company) throw notFound();
 
