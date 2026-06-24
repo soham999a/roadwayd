@@ -14,6 +14,7 @@ import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings.index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
+import { Route as SettingsSupportRouteImport } from './routes/settings.support'
 import { Route as SettingsPreferencesRouteImport } from './routes/settings.preferences'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies.$companyId'
 
@@ -42,6 +43,11 @@ const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
   path: '/companies/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsSupportRoute = SettingsSupportRouteImport.update({
+  id: '/settings/support',
+  path: '/settings/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsPreferencesRoute = SettingsPreferencesRouteImport.update({
   id: '/settings/preferences',
   path: '/settings/preferences',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/support': typeof SettingsSupportRoute
   '/companies/': typeof CompaniesIndexRoute
   '/settings/': typeof SettingsIndexRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/support': typeof SettingsSupportRoute
   '/companies': typeof CompaniesIndexRoute
   '/settings': typeof SettingsIndexRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/support': typeof SettingsSupportRoute
   '/companies/': typeof CompaniesIndexRoute
   '/settings/': typeof SettingsIndexRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/quotation'
     | '/companies/$companyId'
     | '/settings/preferences'
+    | '/settings/support'
     | '/companies/'
     | '/settings/'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/quotation'
     | '/companies/$companyId'
     | '/settings/preferences'
+    | '/settings/support'
     | '/companies'
     | '/settings'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/quotation'
     | '/companies/$companyId'
     | '/settings/preferences'
+    | '/settings/support'
     | '/companies/'
     | '/settings/'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   QuotationRoute: typeof QuotationRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   SettingsPreferencesRoute: typeof SettingsPreferencesRoute
+  SettingsSupportRoute: typeof SettingsSupportRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
 }
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompaniesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/support': {
+      id: '/settings/support'
+      path: '/settings/support'
+      fullPath: '/settings/support'
+      preLoaderRoute: typeof SettingsSupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings/preferences': {
       id: '/settings/preferences'
       path: '/settings/preferences'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuotationRoute: QuotationRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   SettingsPreferencesRoute: SettingsPreferencesRoute,
+  SettingsSupportRoute: SettingsSupportRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
 }
