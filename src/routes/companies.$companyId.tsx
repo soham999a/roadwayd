@@ -257,7 +257,7 @@ function CompanyDetail() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </Fragment>
                 );
               })
             )}
