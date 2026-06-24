@@ -9,38 +9,147 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as QuotationRouteImport } from './routes/quotation'
+import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings.index'
+import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
+import { Route as SettingsSupportRouteImport } from './routes/settings.support'
+import { Route as SettingsPreferencesRouteImport } from './routes/settings.preferences'
+import { Route as CompaniesCompanyIdRouteImport } from './routes/companies.$companyId'
 
+const QuotationRoute = QuotationRouteImport.update({
+  id: '/quotation',
+  path: '/quotation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivityRoute = ActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
+  id: '/companies/',
+  path: '/companies/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsSupportRoute = SettingsSupportRouteImport.update({
+  id: '/settings/support',
+  path: '/settings/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsPreferencesRoute = SettingsPreferencesRouteImport.update({
+  id: '/settings/preferences',
+  path: '/settings/preferences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
+  id: '/companies/$companyId',
+  path: '/companies/$companyId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
+  '/quotation': typeof QuotationRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
+  '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/support': typeof SettingsSupportRoute
+  '/companies/': typeof CompaniesIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
+  '/quotation': typeof QuotationRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
+  '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/support': typeof SettingsSupportRoute
+  '/companies': typeof CompaniesIndexRoute
+  '/settings': typeof SettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
+  '/quotation': typeof QuotationRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
+  '/settings/preferences': typeof SettingsPreferencesRoute
+  '/settings/support': typeof SettingsSupportRoute
+  '/companies/': typeof CompaniesIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/activity'
+    | '/quotation'
+    | '/companies/$companyId'
+    | '/settings/preferences'
+    | '/settings/support'
+    | '/companies/'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/activity'
+    | '/quotation'
+    | '/companies/$companyId'
+    | '/settings/preferences'
+    | '/settings/support'
+    | '/companies'
+    | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/activity'
+    | '/quotation'
+    | '/companies/$companyId'
+    | '/settings/preferences'
+    | '/settings/support'
+    | '/companies/'
+    | '/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ActivityRoute: typeof ActivityRoute
+  QuotationRoute: typeof QuotationRoute
+  CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
+  SettingsPreferencesRoute: typeof SettingsPreferencesRoute
+  SettingsSupportRoute: typeof SettingsSupportRoute
+  CompaniesIndexRoute: typeof CompaniesIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/quotation': {
+      id: '/quotation'
+      path: '/quotation'
+      fullPath: '/quotation'
+      preLoaderRoute: typeof QuotationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activity': {
+      id: '/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof ActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +157,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companies/': {
+      id: '/companies/'
+      path: '/companies'
+      fullPath: '/companies/'
+      preLoaderRoute: typeof CompaniesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/support': {
+      id: '/settings/support'
+      path: '/settings/support'
+      fullPath: '/settings/support'
+      preLoaderRoute: typeof SettingsSupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/preferences': {
+      id: '/settings/preferences'
+      path: '/settings/preferences'
+      fullPath: '/settings/preferences'
+      preLoaderRoute: typeof SettingsPreferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companies/$companyId': {
+      id: '/companies/$companyId'
+      path: '/companies/$companyId'
+      fullPath: '/companies/$companyId'
+      preLoaderRoute: typeof CompaniesCompanyIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ActivityRoute: ActivityRoute,
+  QuotationRoute: QuotationRoute,
+  CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
+  SettingsPreferencesRoute: SettingsPreferencesRoute,
+  SettingsSupportRoute: SettingsSupportRoute,
+  CompaniesIndexRoute: CompaniesIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
