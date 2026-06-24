@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as QuotationRouteImport } from './routes/quotation'
 import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings.index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies.$companyId'
 
@@ -28,6 +29,11 @@ const ActivityRoute = ActivityRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies': typeof CompaniesIndexRoute
+  '/settings': typeof SettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/quotation': typeof QuotationRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,8 +80,15 @@ export interface FileRouteTypes {
     | '/quotation'
     | '/companies/$companyId'
     | '/companies/'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/activity' | '/quotation' | '/companies/$companyId' | '/companies'
+  to:
+    | '/'
+    | '/activity'
+    | '/quotation'
+    | '/companies/$companyId'
+    | '/companies'
+    | '/settings'
   id:
     | '__root__'
     | '/'
@@ -80,6 +96,7 @@ export interface FileRouteTypes {
     | '/quotation'
     | '/companies/$companyId'
     | '/companies/'
+    | '/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +105,7 @@ export interface RootRouteChildren {
   QuotationRoute: typeof QuotationRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -113,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/companies/': {
       id: '/companies/'
       path: '/companies'
@@ -136,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuotationRoute: QuotationRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
