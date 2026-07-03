@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
   { to: "/", label: "Dashboard", icon: <LayoutDashboard className="size-4" /> },
   { to: "/companies", label: "Companies", icon: <Building2 className="size-4" /> },
   { to: "/quotation", label: "Quotation", icon: <FileText className="size-4" /> },
-  { to: "/activity", label: "Today's Activity", icon: <Wallet className="size-4" /> },
+  { to: "/activity", label: "Payments", icon: <Wallet className="size-4" /> },
   { to: "/settings", label: "Settings", icon: <Settings className="size-4" /> },
 ];
 

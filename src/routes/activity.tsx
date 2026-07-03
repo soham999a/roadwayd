@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 export const Route = createFileRoute("/activity")({
   head: () => ({
     meta: [
-      { title: "Today's Activity — Popular Roadways" },
+      { title: "Payments — Popular Roadways" },
       { name: "description", content: "Activity log for today." },
     ],
   }),
@@ -27,7 +27,7 @@ function ActivityPage() {
 
   return (
     <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-4xl mx-auto">
-      <PageHeader title="Today's Activity" description="Everything that happened today, in order." />
+      <PageHeader title="Payments" description="Payment history in order." />
 
       <Card>
         <CardContent className="p-0">
