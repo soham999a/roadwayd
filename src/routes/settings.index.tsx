@@ -10,7 +10,7 @@ export const Route = createFileRoute("/settings/")({
 
 function SettingsIndex() {
   return (
-    <div className="px-6 py-8 max-w-4xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-4xl mx-auto">
       <PageHeader title="Settings" description="Preferences and support." />
       <div className="grid gap-4 sm:grid-cols-2">
         <Tile

@@ -88,7 +88,7 @@ function CompanyDetail() {
   };
 
   return (
-    <div className="px-6 py-8 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto">
       <Link to="/companies" className="text-xs text-muted-foreground inline-flex items-center gap-1 mb-3">
         <ArrowLeft className="size-3" /> Back to companies
       </Link>
@@ -142,126 +142,130 @@ function CompanyDetail() {
       />
 
       <Card className="overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Bill #</TableHead>
-              <TableHead>Invoice</TableHead>
-              <TableHead>Loading</TableHead>
-              <TableHead>Trucks</TableHead>
-              <TableHead>Goods</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {bills.length === 0 ? (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground py-10">
-                  No bills yet. Click “Add bill”.
-                </TableCell>
+                <TableHead>Bill #</TableHead>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Loading</TableHead>
+                <TableHead>Trucks</TableHead>
+                <TableHead>Goods</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Action</TableHead>
               </TableRow>
-            ) : (
-              bills.map((b) => {
-                const billPayments = state.payments.filter((p) => p.billId === b.id);
-                const received = billPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-                const isExpanded = expanded === b.id;
-                return (
-                  <Fragment key={b.id}>
-                    <TableRow className="cursor-pointer" onClick={() => setExpanded(isExpanded ? null : b.id)}>
-                      <TableCell className="font-medium">{b.billNumber || "—"}</TableCell>
-                      <TableCell>{b.invoiceNumber || "—"}</TableCell>
-                      <TableCell>{b.loadingDate || "—"}</TableCell>
-                      <TableCell>{b.truckCount || "—"}</TableCell>
-                      <TableCell>{b.goods || "—"}</TableCell>
-                      <TableCell>{b.amount ? `₹${Number(b.amount).toLocaleString("en-IN")}` : "—"}</TableCell>
-                      <TableCell>
-                        <Badge className={statusVariant(b.status)}>{b.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setPayForm(emptyPayment);
-                              setPayOpenFor(b.id);
-                            }}
-                          >
-                            <Wallet className="size-3.5" /> Add payment
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => {
-                              if (confirm("Delete this bill and its payments?")) {
-                                deleteBill(b.id);
-                                toast.success("Bill deleted");
-                              }
-                            }}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                    {isExpanded && (
-                      <TableRow>
-                        <TableCell colSpan={8} className="bg-muted/40">
-                          <div className="px-2 py-3">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="text-xs font-medium uppercase text-muted-foreground">
-                                Payments · Received ₹{received.toLocaleString("en-IN")}
-                              </div>
-                            </div>
-                            {billPayments.length === 0 ? (
-                              <p className="text-sm text-muted-foreground">No payments recorded yet.</p>
-                            ) : (
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead>Mode</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Account</TableHead>
-                                    <TableHead>Amount</TableHead>
-                                    <TableHead></TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {billPayments.map((p) => (
-                                    <TableRow key={p.id}>
-                                      <TableCell>{p.mode || "—"}</TableCell>
-                                      <TableCell>{p.date || "—"}</TableCell>
-                                      <TableCell>{p.account || "—"}</TableCell>
-                                      <TableCell>₹{Number(p.amount || 0).toLocaleString("en-IN")}</TableCell>
-                                      <TableCell className="text-right">
-                                        <Button
-                                          size="icon"
-                                          variant="ghost"
-                                          onClick={() => {
-                                            deletePayment(p.id);
-                                            toast.success("Payment removed");
-                                          }}
-                                        >
-                                          <Trash2 className="size-4 text-destructive" />
-                                        </Button>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            )}
+            </TableHeader>
+            <TableBody>
+              {bills.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-10">
+                    No bills yet. Click “Add bill”.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                bills.map((b) => {
+                  const billPayments = state.payments.filter((p) => p.billId === b.id);
+                  const received = billPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+                  const isExpanded = expanded === b.id;
+                  return (
+                    <Fragment key={b.id}>
+                      <TableRow className="cursor-pointer" onClick={() => setExpanded(isExpanded ? null : b.id)}>
+                        <TableCell className="font-medium whitespace-nowrap">{b.billNumber || "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap">{b.invoiceNumber || "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap">{b.loadingDate || "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap">{b.truckCount || "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap">{b.goods || "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap">{b.amount ? `₹${Number(b.amount).toLocaleString("en-IN")}` : "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          <Badge className={statusVariant(b.status)}>{b.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setPayForm(emptyPayment);
+                                setPayOpenFor(b.id);
+                              }}
+                            >
+                              <Wallet className="size-3.5" /> Add payment
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => {
+                                if (confirm("Delete this bill and its payments?")) {
+                                  deleteBill(b.id);
+                                  toast.success("Bill deleted");
+                                }
+                              }}
+                            >
+                              <Trash2 className="size-4 text-destructive" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </Fragment>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+                      {isExpanded && (
+                        <TableRow>
+                          <TableCell colSpan={8} className="bg-muted/40">
+                            <div className="px-2 py-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-xs font-medium uppercase text-muted-foreground">
+                                  Payments · Received ₹{received.toLocaleString("en-IN")}
+                                </div>
+                              </div>
+                              {billPayments.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">No payments recorded yet.</p>
+                              ) : (
+                                <div className="overflow-x-auto">
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead>Mode</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Account</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead></TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {billPayments.map((p) => (
+                                        <TableRow key={p.id}>
+                                          <TableCell className="whitespace-nowrap">{p.mode || "—"}</TableCell>
+                                          <TableCell className="whitespace-nowrap">{p.date || "—"}</TableCell>
+                                          <TableCell className="whitespace-nowrap">{p.account || "—"}</TableCell>
+                                          <TableCell className="whitespace-nowrap">₹{Number(p.amount || 0).toLocaleString("en-IN")}</TableCell>
+                                          <TableCell className="text-right whitespace-nowrap">
+                                            <Button
+                                              size="icon"
+                                              variant="ghost"
+                                              onClick={() => {
+                                                deletePayment(p.id);
+                                                toast.success("Payment removed");
+                                              }}
+                                            >
+                                              <Trash2 className="size-4 text-destructive" />
+                                            </Button>
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </Fragment>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
 
       <Dialog open={!!payOpenFor} onOpenChange={(o) => !o && setPayOpenFor(null)}>

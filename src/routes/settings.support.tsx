@@ -13,7 +13,7 @@ const SUPPORT_URL = "https://support.nicecare.co/chat";
 
 function SupportPage() {
   return (
-    <div className="px-6 py-8 max-w-3xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-3xl mx-auto">
       <Link to="/settings" className="text-xs text-muted-foreground inline-flex items-center gap-1 mb-3">
         <ArrowLeft className="size-3" /> Back to settings
       </Link>

@@ -45,7 +45,7 @@ function Dashboard() {
   const outstanding = totalBilled - totalReceived;
 
   return (
-    <div className="px-6 py-8 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto">
       <PageHeader title="Dashboard" description="A quick look at your business today." />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

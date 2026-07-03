@@ -26,7 +26,7 @@ function ActivityPage() {
   const earlier = state.activities.filter((a) => !isToday(a.at));
 
   return (
-    <div className="px-6 py-8 max-w-4xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-4xl mx-auto">
       <PageHeader title="Today's Activity" description="Everything that happened today, in order." />
 
       <Card>

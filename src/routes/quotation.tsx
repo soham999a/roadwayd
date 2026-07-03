@@ -56,7 +56,7 @@ function QuotationPage() {
   };
 
   return (
-    <div className="px-6 py-8 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto">
       <PageHeader title="Quotation" description="Build a freight quotation, save it, print or share." />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
@@ -88,52 +88,54 @@ function QuotationPage() {
             <CardTitle className="text-base">Saved quotations</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>From → To</TableHead>
-                  <TableHead>Freight</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {state.quotations.length === 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                      No quotations yet.
-                    </TableCell>
+                    <TableHead>From → To</TableHead>
+                    <TableHead>Freight</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead className="text-right"></TableHead>
                   </TableRow>
-                ) : (
-                  state.quotations.map((q) => (
-                    <TableRow key={q.id}>
-                      <TableCell className="font-medium">{q.from} → {q.to}</TableCell>
-                      <TableCell>{q.truckFreight ? `₹${Number(q.truckFreight).toLocaleString("en-IN")}` : "—"}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{new Date(q.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button size="icon" variant="ghost" onClick={() => setPreview(q)}>
-                            <Printer className="size-4" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => {
-                              if (confirm("Delete this quotation?")) {
-                                deleteQuotation(q.id);
-                                toast.success("Deleted");
-                              }
-                            }}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
+                </TableHeader>
+                <TableBody>
+                  {state.quotations.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                        No quotations yet.
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : (
+                    state.quotations.map((q) => (
+                      <TableRow key={q.id}>
+                        <TableCell className="font-medium whitespace-nowrap">{q.from} → {q.to}</TableCell>
+                        <TableCell className="whitespace-nowrap">{q.truckFreight ? `₹${Number(q.truckFreight).toLocaleString("en-IN")}` : "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{new Date(q.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right whitespace-nowrap">
+                          <div className="flex justify-end gap-1">
+                            <Button size="icon" variant="ghost" onClick={() => setPreview(q)}>
+                              <Printer className="size-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => {
+                                if (confirm("Delete this quotation?")) {
+                                  deleteQuotation(q.id);
+                                  toast.success("Deleted");
+                                }
+                              }}
+                            >
+                              <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

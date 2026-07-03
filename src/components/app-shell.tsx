@@ -56,14 +56,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 pb-16 md:pb-0">
         <header className="md:hidden flex items-center justify-between px-4 py-3 border-b bg-sidebar text-sidebar-foreground">
           <div className="flex items-center gap-2">
             <Truck className="size-5" />
             <span className="font-semibold text-sm">Popular Roadways</span>
           </div>
         </header>
-        <nav className="md:hidden flex overflow-x-auto gap-1 px-2 py-2 border-b bg-card">
+        <main className="flex-1 overflow-x-hidden">{children}</main>
+
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex bg-sidebar text-sidebar-foreground border-t border-sidebar-border">
           {navItems.map((item) => {
             const active =
               item.to === "/"
@@ -74,8 +76,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-xs",
-                  active ? "bg-primary text-primary-foreground" : "text-foreground/70 hover:bg-accent",
+                  "flex flex-col items-center gap-0.5 flex-1 py-2 text-[10px] transition-colors",
+                  active
+                    ? "text-sidebar-primary"
+                    : "text-sidebar-foreground/60 hover:text-sidebar-foreground/90",
                 )}
               >
                 {item.icon}
@@ -84,7 +88,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
-        <main className="flex-1 overflow-x-hidden">{children}</main>
       </div>
     </div>
   );
@@ -100,9 +103,9 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
+    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">{title}</h1>
         {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}

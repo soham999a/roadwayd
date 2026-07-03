@@ -48,7 +48,7 @@ function CompaniesPage() {
   };
 
   return (
-    <div className="px-6 py-8 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto">
       <PageHeader
         title="Companies"
         description="All client companies, their bills and payment history."
@@ -87,58 +87,60 @@ function CompaniesPage() {
       />
 
       <Card className="overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>GST</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Number</TableHead>
-              <TableHead className="text-right">Open</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {state.companies.length === 0 ? (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-10">
-                  No companies yet. Click “Add company” to create your first one.
-                </TableCell>
+                <TableHead>Name</TableHead>
+                <TableHead>GST</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Number</TableHead>
+                <TableHead className="text-right">Open</TableHead>
               </TableRow>
-            ) : (
-              state.companies.map((c) => (
-                <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.name}</TableCell>
-                  <TableCell>{c.gst || "—"}</TableCell>
-                  <TableCell>{c.contact || "—"}</TableCell>
-                  <TableCell>{c.email || "—"}</TableCell>
-                  <TableCell>{c.number || "—"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          if (confirm(`Delete ${c.name}? This removes its bills and payments.`)) {
-                            deleteCompany(c.id);
-                            toast.success("Company deleted");
-                          }
-                        }}
-                      >
-                        <Trash2 className="size-4 text-destructive" />
-                      </Button>
-                      <Button asChild variant="ghost" size="icon">
-                        <Link to="/companies/$companyId" params={{ companyId: c.id }}>
-                          <ArrowRight className="size-4" />
-                        </Link>
-                      </Button>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {state.companies.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-10">
+                    No companies yet. Click “Add company” to create your first one.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                state.companies.map((c) => (
+                  <TableRow key={c.id}>
+                    <TableCell className="font-medium whitespace-nowrap">{c.name}</TableCell>
+                    <TableCell className="whitespace-nowrap">{c.gst || "—"}</TableCell>
+                    <TableCell className="whitespace-nowrap">{c.contact || "—"}</TableCell>
+                    <TableCell className="whitespace-nowrap">{c.email || "—"}</TableCell>
+                    <TableCell className="whitespace-nowrap">{c.number || "—"}</TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            if (confirm(`Delete ${c.name}? This removes its bills and payments.`)) {
+                              deleteCompany(c.id);
+                              toast.success("Company deleted");
+                            }
+                          }}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                        <Button asChild variant="ghost" size="icon">
+                          <Link to="/companies/$companyId" params={{ companyId: c.id }}>
+                            <ArrowRight className="size-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
     </div>
   );
