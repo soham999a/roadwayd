@@ -109,9 +109,9 @@ function Dashboard() {
             ) : (
               <ul className="space-y-2">
                 {state.activities.slice(0, 6).map((a) => (
-                  <li key={a.id} className="text-sm flex justify-between gap-3">
-                    <span>{a.message}</span>
-                    <span className="text-xs text-muted-foreground shrink-0">
+                  <li key={a.id} className="text-sm flex justify-between gap-2">
+                    <span className="truncate min-w-0">{a.message}</span>
+                    <span className="text-xs text-muted-foreground shrink-0 whitespace-nowrap">
                       {new Date(a.at).toLocaleString()}
                     </span>
                   </li>

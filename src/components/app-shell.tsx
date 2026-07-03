@@ -182,7 +182,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       {state.payments.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No payments yet.</p>
                       ) : (
-                        <div className="overflow-x-auto">
+                        <div className="-mx-6 px-6 overflow-x-auto">
                           <Table>
                             <TableHeader>
                               <TableRow>
@@ -190,8 +190,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                                 <TableHead>Mode</TableHead>
                                 <TableHead>Date</TableHead>
                                 <TableHead>Account</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead></TableHead>
+                                <TableHead className="text-right">Amount</TableHead>
+                                <TableHead className="w-10"></TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -199,21 +199,22 @@ export function AppShell({ children }: { children: ReactNode }) {
                                 const c = state.companies.find((co) => co.id === p.companyId);
                                 return (
                                   <TableRow key={p.id}>
-                                    <TableCell className="whitespace-nowrap">{c?.name || "—"}</TableCell>
+                                    <TableCell className="whitespace-nowrap max-w-[120px] truncate">{c?.name || "—"}</TableCell>
                                     <TableCell className="whitespace-nowrap">{p.mode || "—"}</TableCell>
                                     <TableCell className="whitespace-nowrap">{p.date || "—"}</TableCell>
-                                    <TableCell className="whitespace-nowrap">{p.account || "—"}</TableCell>
-                                    <TableCell className="whitespace-nowrap">₹{Number(p.amount || 0).toLocaleString("en-IN")}</TableCell>
+                                    <TableCell className="whitespace-nowrap max-w-[100px] truncate">{p.account || "—"}</TableCell>
+                                    <TableCell className="whitespace-nowrap text-right font-medium">₹{Number(p.amount || 0).toLocaleString("en-IN")}</TableCell>
                                     <TableCell className="whitespace-nowrap">
                                       <Button
                                         size="icon"
                                         variant="ghost"
+                                        className="size-7"
                                         onClick={() => {
                                           deletePayment(p.id);
                                           toast.success("Payment removed");
                                         }}
                                       >
-                                        <Trash2 className="size-4 text-destructive" />
+                                        <Trash2 className="size-3.5 text-destructive" />
                                       </Button>
                                     </TableCell>
                                   </TableRow>
@@ -264,6 +265,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2">
             <Truck className="size-5" />
             <span className="font-semibold text-sm">Popular Roadways</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px] text-sidebar-foreground/60">
+            {syncStatus === "loading" ? (
+              <><Loader className="size-3 animate-spin" /> Syncing</>
+            ) : syncStatus === "error" ? (
+              <><CloudOff className="size-3 text-destructive" /> Error</>
+            ) : (
+              <><Cloud className="size-3" /> OK</>
+            )}
           </div>
         </header>
         <main className="flex-1 overflow-x-hidden">{children}</main>

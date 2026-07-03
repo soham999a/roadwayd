@@ -13,6 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Printer, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,6 +52,7 @@ function QuotationPage() {
   const { state, addQuotation, deleteQuotation } = useStore();
   const [form, setForm] = useState(empty);
   const [preview, setPreview] = useState<Quotation | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,24 +120,20 @@ function QuotationPage() {
                     state.quotations.map((q) => (
                       <TableRow key={q.id}>
                         <TableCell className="font-medium whitespace-nowrap">{q.from} → {q.to}</TableCell>
-                        <TableCell className="whitespace-nowrap">{q.truckFreight ? `₹${Number(q.truckFreight).toLocaleString("en-IN")}` : "—"}</TableCell>
-                        <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{new Date(q.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell className="whitespace-nowrap text-xs sm:text-sm">{q.truckFreight ? `₹${Number(q.truckFreight).toLocaleString("en-IN")}` : "—"}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground whitespace-nowrap hidden sm:table-cell">{new Date(q.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right whitespace-nowrap">
                           <div className="flex justify-end gap-1">
-                            <Button size="icon" variant="ghost" onClick={() => setPreview(q)}>
-                              <Printer className="size-4" />
+                            <Button size="icon" variant="ghost" className="size-8 sm:size-9" onClick={() => setPreview(q)}>
+                              <Printer className="size-3.5 sm:size-4" />
                             </Button>
                             <Button
                               size="icon"
                               variant="ghost"
-                              onClick={() => {
-                                if (confirm("Delete this quotation?")) {
-                                  deleteQuotation(q.id);
-                                  toast.success("Deleted");
-                                }
-                              }}
+                              className="size-8 sm:size-9"
+                              onClick={() => setDeleteTarget(q.id)}
                             >
-                              <Trash2 className="size-4 text-destructive" />
+                              <Trash2 className="size-3.5 sm:size-4 text-destructive" />
                             </Button>
                           </div>
                         </TableCell>
@@ -139,6 +146,32 @@ function QuotationPage() {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete quotation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the quotation from {state.quotations.find((q) => q.id === deleteTarget)?.from} → {state.quotations.find((q) => q.id === deleteTarget)?.to}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteTarget(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteTarget) {
+                  deleteQuotation(deleteTarget);
+                  toast.success("Deleted");
+                  setDeleteTarget(null);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
         <DialogContent className="max-w-2xl">

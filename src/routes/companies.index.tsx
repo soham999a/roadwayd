@@ -143,16 +143,16 @@ function CompaniesPage() {
               ) : (
                 state.companies.map((c) => (
                   <TableRow key={c.id}>
-                    <TableCell className="font-medium text-base">{c.name}</TableCell>
+                    <TableCell className="font-medium text-sm sm:text-base truncate max-w-[160px] sm:max-w-none">{c.name}</TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Button asChild size="sm" variant="default">
+                      <div className="flex gap-1.5 sm:gap-2">
+                        <Button asChild size="sm" variant="default" className="h-8 px-2 text-xs sm:text-sm sm:h-9 sm:px-3">
                           <Link to="/companies/$companyId" params={{ companyId: c.id }}>
-                            <LogIn className="size-3.5" /> Enter
+                            <LogIn className="size-3 sm:size-3.5" /> Enter
                           </Link>
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => openEdit(c)}>
-                          <Pencil className="size-3.5" /> Edit
+                        <Button size="sm" variant="outline" onClick={() => openEdit(c)} className="h-8 px-2 text-xs sm:text-sm sm:h-9 sm:px-3">
+                          <Pencil className="size-3 sm:size-3.5" /> Edit
                         </Button>
                       </div>
                     </TableCell>
