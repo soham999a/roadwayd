@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, ArrowLeft, Trash2, Wallet } from "lucide-react";
+import { Plus, ArrowLeft, Trash2, Wallet, Building2, Phone, Mail, FileText, Truck } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/companies/$companyId")({
@@ -89,18 +89,33 @@ function CompanyDetail() {
 
   return (
     <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto">
-      <Link to="/companies" className="text-xs text-muted-foreground inline-flex items-center gap-1 mb-3">
+      <Link to="/companies" className="text-xs text-muted-foreground inline-flex items-center gap-1 mb-4">
         <ArrowLeft className="size-3" /> Back to companies
       </Link>
+
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Building2 className="size-5 text-primary" />
+            {company.name}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <InfoItem icon={<FileText className="size-4" />} label="GST" value={company.gst || "—"} />
+            <InfoItem icon={<Phone className="size-4" />} label="Contact" value={company.contact || "—"} />
+            <InfoItem icon={<Mail className="size-4" />} label="Email" value={company.email || "—"} />
+            <InfoItem icon={<Truck className="size-4" />} label="Number" value={company.number || "—"} />
+          </div>
+        </CardContent>
+      </Card>
+
       <PageHeader
-        title={company.name}
-        description={[company.gst && `GST: ${company.gst}`, company.contact, company.email, company.number]
-          .filter(Boolean)
-          .join(" · ")}
+        title="Bills"
         actions={
           <Dialog open={billOpen} onOpenChange={setBillOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button size="sm">
                 <Plus className="size-4" /> Add bill
               </Button>
             </DialogTrigger>
@@ -304,6 +319,18 @@ function F({
     <div className="grid gap-1.5">
       <Label className="text-xs">{label}</Label>
       <Input type={type} value={v} onChange={(e) => on(e.target.value)} />
+    </div>
+  );
+}
+
+function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2.5 rounded-lg border bg-muted/30 px-3.5 py-2.5">
+      <span className="text-muted-foreground">{icon}</span>
+      <div>
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
+        <div className="text-sm font-medium">{value}</div>
+      </div>
     </div>
   );
 }

@@ -102,6 +102,7 @@ function uid() {
 type Ctx = {
   state: State;
   addCompany: (c: Omit<Company, "id" | "createdAt">) => Company;
+  updateCompany: (id: string, data: Partial<Omit<Company, "id" | "createdAt">>) => void;
   deleteCompany: (id: string) => void;
   addBill: (b: Omit<Bill, "id" | "createdAt">) => Bill;
   deleteBill: (id: string) => void;
@@ -142,6 +143,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       pushActivity({ type: "company", message: `Added company "${company.name}"` });
       return company;
     },
+    updateCompany: (id, data) =>
+      setState((s) => ({
+        ...s,
+        companies: s.companies.map((c) => (c.id === id ? { ...c, ...data } : c)),
+      })),
     deleteCompany: (id) =>
       setState((s) => {
         const billIds = s.bills.filter((b) => b.companyId === id).map((b) => b.id);
