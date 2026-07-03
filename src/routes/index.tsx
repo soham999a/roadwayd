@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { PageHeader } from "@/components/app-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,9 +41,11 @@ function Stat({
 
 function Dashboard() {
   const { state } = useStore();
-  const totalReceived = state.payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-  const totalBilled = state.bills.reduce((s, b) => s + (Number(b.amount) || 0), 0);
-  const outstanding = totalBilled - totalReceived;
+  const { totalReceived, totalBilled, outstanding } = useMemo(() => {
+    const received = state.payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+    const billed = state.bills.reduce((s, b) => s + (Number(b.amount) || 0), 0);
+    return { totalReceived: received, totalBilled: billed, outstanding: billed - received };
+  }, [state.payments, state.bills]);
 
   return (
     <div className="px-4 sm:px-6 py-6 sm:py-8 max-w-7xl mx-auto">

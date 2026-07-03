@@ -1,6 +1,6 @@
 import { Link, useRouterState, type LinkProps } from "@tanstack/react-router";
 import { type ReactNode, useState } from "react";
-import { LayoutDashboard, Building2, FileText, Wallet, Settings, Truck, Plus, Trash2, Check, ChevronsUpDown } from "lucide-react";
+import { LayoutDashboard, Building2, FileText, Wallet, Settings, Truck, Plus, Trash2, Check, ChevronsUpDown, Cloud, CloudOff, Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ const paymentEmpty = { companyId: "", mode: "", date: "", account: "", amount: "
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { state, addPayment, deletePayment } = useStore();
+  const { state, addPayment, deletePayment, syncStatus } = useStore();
   const [payOpen, setPayOpen] = useState(false);
   const [payForm, setPayForm] = useState(paymentEmpty);
   const [companySearchOpen, setCompanySearchOpen] = useState(false);
@@ -245,8 +245,17 @@ export function AppShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
-        <div className="px-5 py-4 text-[11px] text-sidebar-foreground/60 border-t border-sidebar-border">
-          © {new Date().getFullYear()} Popular Roadways
+        <div className="px-5 py-3 text-[11px] text-sidebar-foreground/60 border-t border-sidebar-border space-y-1">
+          <div className="flex items-center gap-1.5">
+            {syncStatus === "loading" ? (
+              <><Loader className="size-3 animate-spin" /> Syncing...</>
+            ) : syncStatus === "error" ? (
+              <><CloudOff className="size-3 text-destructive" /> Sync error</>
+            ) : (
+              <><Cloud className="size-3" /> Synced</>
+            )}
+          </div>
+          <div>© {new Date().getFullYear()} Popular Roadways</div>
         </div>
       </aside>
 
