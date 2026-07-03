@@ -1,14 +1,18 @@
 import { initializeApp } from "firebase/app";
 import {
-  getDatabase,
-  ref,
-  set,
-  get,
-  child,
-  onValue,
-  off,
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  deleteDoc,
+  collection,
+  query,
+  getDocs,
+  onSnapshot,
+  writeBatch,
   type Unsubscribe,
-} from "firebase/database";
+  type DocumentData,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -22,41 +26,53 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getFirestore(app);
 
-export function getDbRef(path: string) {
-  return ref(db, path);
+export async function writeDoc<T extends DocumentData>(path: string, id: string, data: T): Promise<void> {
+  await setDoc(doc(db, path, id), data);
 }
 
-export async function readData<T>(path: string): Promise<T | null> {
-  const snapshot = await get(child(ref(db), path));
-  return snapshot.exists() ? (snapshot.val() as T) : null;
-}
+export { deleteDoc as deleteDoc_ };
 
-export async function writeData(path: string, data: unknown): Promise<void> {
-  await set(ref(db, path), data);
-}
-
-export function subscribeData(
-  path: string,
-  callback: (data: unknown) => void
-): Unsubscribe {
-  const dataRef = ref(db, path);
-  const unsubscribe = onValue(dataRef, (snapshot) => {
-    callback(snapshot.exists() ? snapshot.val() : null);
+export async function readCollection<T>(path: string): Promise<Record<string, T>> {
+  const snap = await getDocs(query(collection(db, path)));
+  const result: Record<string, T> = {};
+  snap.forEach((d) => {
+    result[d.id] = d.data() as T;
   });
-  return unsubscribe;
+  return result;
 }
 
-export function subscribeChildData(
+export function subscribeCollection<T>(
   path: string,
-  callback: (data: Record<string, unknown> | null) => void
+  callback: (data: Record<string, T>) => void
 ): Unsubscribe {
-  const dataRef = ref(db, path);
-  const unsubscribe = onValue(dataRef, (snapshot) => {
-    callback(snapshot.exists() ? (snapshot.val() as Record<string, unknown>) : null);
+  const col = collection(db, path);
+  return onSnapshot(col, (snap) => {
+    const result: Record<string, T> = {};
+    snap.forEach((d) => {
+      result[d.id] = d.data() as T;
+    });
+    callback(result);
   });
-  return unsubscribe;
 }
 
-export { off, ref };
+export function subscribeDoc<T>(
+  path: string,
+  callback: (data: T | null) => void
+): Unsubscribe {
+  const d = doc(db, path);
+  return onSnapshot(d, (snap) => {
+    callback(snap.exists() ? (snap.data() as T) : null);
+  });
+}
+
+export async function writeBatchData(items: Array<{ path: string; id: string; data: DocumentData }>): Promise<void> {
+  const batch = writeBatch(db);
+  for (const item of items) {
+    batch.set(doc(db, item.path, item.id), item.data);
+  }
+  await batch.commit();
+}
+
+export { db };

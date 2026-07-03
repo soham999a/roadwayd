@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState, useRef, useCallback, type ReactNode } from "react";
-import { writeData, subscribeData } from "./firebase";
+import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react";
+import { writeDoc, deleteDoc_, subscribeCollection, subscribeDoc, writeBatchData } from "./firebase";
+import type { Unsubscribe } from "firebase/firestore";
 
 export type BillStatus = "Paid" | "Not Paid" | "Partial Paid";
 
@@ -72,7 +73,6 @@ type State = {
 };
 
 const STORAGE_KEY = "popular-roadways-v1";
-const FIREBASE_PATH = "roadways-data";
 
 const initial: State = {
   companies: [],
@@ -100,7 +100,7 @@ function loadLocal(): State {
 function saveLocal(state: State): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch { /* quota exceeded — ignore */ }
+  } catch { }
 }
 
 let _counter = 0;
@@ -128,82 +128,151 @@ type Ctx = {
 
 const StoreContext = createContext<Ctx | null>(null);
 
-function mergeState(current: State, incoming: Partial<State>): State {
-  return {
-    ...current,
-    ...incoming,
-    preferences: { ...current.preferences, ...(incoming.preferences ?? current.preferences) },
-  };
+function toMap<T extends { id: string }>(items: T[]): Record<string, T> {
+  const map: Record<string, T> = {};
+  for (const item of items) map[item.id] = item;
+  return map;
+}
+
+function fromMap<T extends { id: string }>(map: Record<string, T>): T[] {
+  return Object.values(map);
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>(initial);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("loading");
   const [hydrated, setHydrated] = useState(false);
+  const [fbReady, setFbReady] = useState(false);
   const stateRef = useRef(state);
-  const pushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const seededRef = useRef(false);
 
   stateRef.current = state;
 
-  // Hydrate from localStorage instantly; seed if empty
+  // 1. Hydrate from localStorage instantly
   useEffect(() => {
     const local = loadLocal();
-    if (local.companies.length === 0 && local.bills.length === 0) {
-      const seed = seedData();
-      saveLocal(seed);
-      setState(seed);
-    } else {
-      setState(local);
-    }
+    setState(local);
     setHydrated(true);
   }, []);
 
-  // Subscribe to Firebase real-time updates (after hydration)
+  // 2. Subscribe to Firestore collections
   useEffect(() => {
     if (!hydrated) return;
+    const unsubs: Unsubscribe[] = [];
+    let loads = 0;
+    const total = 6;
 
-    const unsub = subscribeData(FIREBASE_PATH, (fbData) => {
-      if (fbData && typeof fbData === "object" && !Array.isArray(fbData)) {
-        const incoming = fbData as Partial<State>;
-        setState((prev) => {
-          const merged = mergeState(prev, incoming);
-          saveLocal(merged);
-          return merged;
-        });
+    const onLoad = () => {
+      loads++;
+      if (loads >= total) {
+        setSyncStatus("synced");
+        setFbReady(true);
       }
-      setSyncStatus("synced");
-    });
-
-    // If Firebase never responds within 5s, mark synced anyway
-    const timeout = setTimeout(() => setSyncStatus((s) => (s === "loading" ? "synced" : s)), 5000);
-
-    return () => {
-      unsub();
-      clearTimeout(timeout);
     };
+
+    const onError = () => setSyncStatus("error");
+
+    const onCompanies = (data: Record<string, Omit<Company, "id">>) => {
+      const items = fromMap(data as unknown as Record<string, Company>);
+      setState((prev) => {
+        const next = { ...prev, companies: items };
+        saveLocal(next);
+        return next;
+      });
+      onLoad();
+    };
+    const onBills = (data: Record<string, Omit<Bill, "id">>) => {
+      const items = fromMap(data as unknown as Record<string, Bill>);
+      setState((prev) => {
+        const next = { ...prev, bills: items };
+        saveLocal(next);
+        return next;
+      });
+      onLoad();
+    };
+    const onPayments = (data: Record<string, Omit<Payment, "id">>) => {
+      const items = fromMap(data as unknown as Record<string, Payment>);
+      setState((prev) => {
+        const next = { ...prev, payments: items };
+        saveLocal(next);
+        return next;
+      });
+      onLoad();
+    };
+    const onQuotations = (data: Record<string, Omit<Quotation, "id">>) => {
+      const items = fromMap(data as unknown as Record<string, Quotation>);
+      setState((prev) => {
+        const next = { ...prev, quotations: items };
+        saveLocal(next);
+        return next;
+      });
+      onLoad();
+    };
+    const onActivities = (data: Record<string, Omit<Activity, "id">>) => {
+      const items = fromMap(data as unknown as Record<string, Activity>);
+      setState((prev) => {
+        const next = { ...prev, activities: items };
+        saveLocal(next);
+        return next;
+      });
+      onLoad();
+    };
+    const onPreferences = (data: Preferences | null) => {
+      setState((prev) => {
+        const next = { ...prev, preferences: { ...prev.preferences, ...(data ?? {}) } };
+        saveLocal(next);
+        return next;
+      });
+      onLoad();
+    };
+
+    try {
+      unsubs.push(subscribeCollection("companies", onCompanies));
+      unsubs.push(subscribeCollection("bills", onBills));
+      unsubs.push(subscribeCollection("payments", onPayments));
+      unsubs.push(subscribeCollection("quotations", onQuotations));
+      unsubs.push(subscribeCollection("activities", onActivities));
+      unsubs.push(subscribeDoc("preferences/default", onPreferences));
+    } catch {
+      onError();
+    }
+
+    return () => unsubs.forEach((u) => u());
   }, [hydrated]);
 
-  // Persist to localStorage on every state change (after hydration)
+  // 3. Seed data once if both localStorage and Firestore are empty
   useEffect(() => {
-    if (!hydrated) return;
-    saveLocal(state);
-  }, [state, hydrated]);
+    if (!fbReady) return;
+    if (seededRef.current) return;
+    if (state.companies.length > 0) return;
 
-  // Debounced push to Firebase
-  const pushToFirebase = useCallback((s: State) => {
-    if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
-    pushTimerRef.current = setTimeout(() => {
-      writeData(FIREBASE_PATH, s).catch(() => setSyncStatus("error"));
-    }, 300);
-  }, []);
+    seededRef.current = true;
+    const seed = seedData();
+    const batchItems = [
+      ...seed.companies.map((c) => ({ path: "companies", id: c.id, data: c })),
+      ...seed.bills.map((b) => ({ path: "bills", id: b.id, data: b })),
+      ...seed.payments.map((p) => ({ path: "payments", id: p.id, data: p })),
+      ...seed.quotations.map((q) => ({ path: "quotations", id: q.id, data: q })),
+      ...seed.activities.map((a) => ({ path: "activities", id: a.id, data: a })),
+      { path: "preferences", id: "default", data: seed.preferences },
+    ];
+    writeBatchData(batchItems).catch(() => setSyncStatus("error"));
+    setState(seed);
+    saveLocal(seed);
+  }, [fbReady, state.companies.length]);
 
-  const pushActivity = (a: Omit<Activity, "id" | "at">) => {
+  const pushActivity = async (a: Omit<Activity, "id" | "at">) => {
     const entry: Activity = { id: uid(), at: new Date().toISOString(), ...a };
     setState((s) => {
       const next = { ...s, activities: [entry, ...s.activities].slice(0, 200) };
-      pushToFirebase(next);
+      saveLocal(next);
       return next;
     });
+    try {
+      await writeDoc("activities", entry.id, entry);
+    } catch {
+      setSyncStatus("error");
+    }
   };
 
   const ctx: Ctx = {
@@ -213,48 +282,58 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const company: Company = { id: uid(), createdAt: new Date().toISOString(), ...c };
       setState((s) => {
         const next = { ...s, companies: [company, ...s.companies] };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      writeDoc("companies", company.id, company).catch(() => setSyncStatus("error"));
       pushActivity({ type: "company", message: `Added company "${company.name}"` });
       return company;
     },
     updateCompany: (id, data) => {
       setState((s) => {
         const next = { ...s, companies: s.companies.map((c) => (c.id === id ? { ...c, ...data } : c)) };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      writeDoc("companies", id, { ...data }).catch(() => setSyncStatus("error"));
     },
     deleteCompany: (id) => {
+      const billIds = stateRef.current.bills.filter((b) => b.companyId === id).map((b) => b.id);
       setState((s) => {
-        const billIds = s.bills.filter((b) => b.companyId === id).map((b) => b.id);
         const next = {
           ...s,
           companies: s.companies.filter((c) => c.id !== id),
           bills: s.bills.filter((b) => b.companyId !== id),
           payments: s.payments.filter((p) => !billIds.includes(p.billId)),
         };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      deleteDoc_("companies", id).catch(() => setSyncStatus("error"));
+      billIds.forEach((bid) => deleteDoc_("bills", bid).catch(() => {}));
     },
     addBill: (b) => {
       const bill: Bill = { id: uid(), createdAt: new Date().toISOString(), ...b };
       setState((s) => {
         const next = { ...s, bills: [bill, ...s.bills] };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      writeDoc("bills", bill.id, bill).catch(() => setSyncStatus("error"));
       pushActivity({ type: "bill", message: `Bill ${bill.billNumber || "(no #)"} added` });
       return bill;
     },
     deleteBill: (id) => {
       setState((s) => {
-        const next = { ...s, bills: s.bills.filter((b) => b.id !== id), payments: s.payments.filter((p) => p.billId !== id) };
-        pushToFirebase(next);
+        const next = {
+          ...s,
+          bills: s.bills.filter((b) => b.id !== id),
+          payments: s.payments.filter((p) => p.billId !== id),
+        };
+        saveLocal(next);
         return next;
       });
+      deleteDoc_("bills", id).catch(() => setSyncStatus("error"));
     },
     addPayment: (p) => {
       const payment: Payment = { id: uid(), createdAt: new Date().toISOString(), ...p };
@@ -268,41 +347,46 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ...s.activities,
           ].slice(0, 200),
         };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      writeDoc("payments", payment.id, payment).catch(() => setSyncStatus("error"));
       return payment;
     },
     deletePayment: (id) => {
       setState((s) => {
         const next = { ...s, payments: s.payments.filter((p) => p.id !== id) };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      deleteDoc_("payments", id).catch(() => setSyncStatus("error"));
     },
     addQuotation: (q) => {
       const quotation: Quotation = { id: uid(), createdAt: new Date().toISOString(), ...q };
       setState((s) => {
         const next = { ...s, quotations: [quotation, ...s.quotations] };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      writeDoc("quotations", quotation.id, quotation).catch(() => setSyncStatus("error"));
       pushActivity({ type: "quotation", message: `Quotation ${quotation.from} → ${quotation.to}` });
       return quotation;
     },
     deleteQuotation: (id) => {
       setState((s) => {
         const next = { ...s, quotations: s.quotations.filter((q) => q.id !== id) };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      deleteDoc_("quotations", id).catch(() => setSyncStatus("error"));
     },
     setBusinessFields: (fields) => {
       setState((s) => {
         const next = { ...s, preferences: { ...s.preferences, businessFields: fields } };
-        pushToFirebase(next);
+        saveLocal(next);
         return next;
       });
+      writeDoc("preferences", "default", { businessFields: fields }).catch(() => setSyncStatus("error"));
     },
   };
 
