@@ -27,7 +27,8 @@ export type Bill = {
 
 export type Payment = {
   id: string;
-  billId: string;
+  billId?: string;
+  companyId?: string;
   mode: string;
   date: string;
   account: string;
@@ -165,8 +166,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       })),
     addPayment: (p) => {
       const payment: Payment = { id: uid(), createdAt: new Date().toISOString(), ...p };
-      setState((s) => ({ ...s, payments: [payment, ...s.payments] }));
-      pushActivity({ type: "payment", message: `Payment of ₹${payment.amount} received` });
+      setState((s) => {
+        const company = p.companyId ? s.companies.find((c) => c.id === p.companyId) : undefined;
+        return {
+          ...s,
+          payments: [payment, ...s.payments],
+          activities: [
+            {
+              id: uid(),
+              at: new Date().toISOString(),
+              type: "payment" as const,
+              message: `Payment of ₹${payment.amount}${company ? ` from ${company.name}` : ""} received`,
+            },
+            ...s.activities,
+          ].slice(0, 200),
+        };
+      });
       return payment;
     },
     deletePayment: (id) => setState((s) => ({ ...s, payments: s.payments.filter((p) => p.id !== id) })),

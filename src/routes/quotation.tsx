@@ -68,13 +68,13 @@ function QuotationPage() {
             <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
               <F label="From" v={form.from} on={(v) => setForm({ ...form, from: v })} />
               <F label="To" v={form.to} on={(v) => setForm({ ...form, to: v })} />
-              <F label="Truck freight (₹)" type="number" v={form.truckFreight} on={(v) => setForm({ ...form, truckFreight: v })} />
+              <F label="Truck freight (₹)" v={form.truckFreight} on={(v) => setForm({ ...form, truckFreight: v })} />
               <F label="Truck category" v={form.truckCategory} on={(v) => setForm({ ...form, truckCategory: v })} />
-              <F label="Detention / day (₹)" type="number" v={form.detentionPerDay} on={(v) => setForm({ ...form, detentionPerDay: v })} />
-              <F label="W.B. GOVT slot booking" type="number" v={form.wbGovtSlot} on={(v) => setForm({ ...form, wbGovtSlot: v })} />
-              <F label="Loading charges (₹)" type="number" v={form.loadingCharges} on={(v) => setForm({ ...form, loadingCharges: v })} />
-              <F label="Unloading charges (₹)" type="number" v={form.unloadingCharges} on={(v) => setForm({ ...form, unloadingCharges: v })} />
-              <F label="C.W.C parking (₹)" type="number" v={form.cwcParking} on={(v) => setForm({ ...form, cwcParking: v })} />
+              <F label="Detention / day (₹)" v={form.detentionPerDay} on={(v) => setForm({ ...form, detentionPerDay: v })} />
+              <F label="W.B. GOVT slot booking" v={form.wbGovtSlot} on={(v) => setForm({ ...form, wbGovtSlot: v })} />
+              <F label="Loading charges (₹)" v={form.loadingCharges} on={(v) => setForm({ ...form, loadingCharges: v })} />
+              <F label="Unloading charges (₹)" v={form.unloadingCharges} on={(v) => setForm({ ...form, unloadingCharges: v })} />
+              <F label="C.W.C parking (₹)" v={form.cwcParking} on={(v) => setForm({ ...form, cwcParking: v })} />
               <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
                 <Button type="button" variant="ghost" onClick={() => setForm(empty)}>Reset</Button>
                 <Button type="submit"><Plus className="size-4" /> Save quotation</Button>

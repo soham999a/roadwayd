@@ -112,9 +112,9 @@ function CompanyDetail() {
                 <F label="Bill number" v={billForm.billNumber} on={(v) => setBillForm({ ...billForm, billNumber: v })} />
                 <F label="Invoice number" v={billForm.invoiceNumber} on={(v) => setBillForm({ ...billForm, invoiceNumber: v })} />
                 <F label="Loading date" type="date" v={billForm.loadingDate} on={(v) => setBillForm({ ...billForm, loadingDate: v })} />
-                <F label="How many trucks" type="number" v={billForm.truckCount} on={(v) => setBillForm({ ...billForm, truckCount: v })} />
+                <F label="How many trucks" v={billForm.truckCount} on={(v) => setBillForm({ ...billForm, truckCount: v })} />
                 <F label="Which goods" v={billForm.goods} on={(v) => setBillForm({ ...billForm, goods: v })} />
-                <F label="Bill amount (₹)" type="number" v={billForm.amount} on={(v) => setBillForm({ ...billForm, amount: v })} />
+                <F label="Bill amount (₹)" v={billForm.amount} on={(v) => setBillForm({ ...billForm, amount: v })} />
                 <div className="grid gap-1.5 sm:col-span-2">
                   <Label className="text-xs">Status</Label>
                   <Select
@@ -277,7 +277,7 @@ function CompanyDetail() {
             <F label="Mode of payment" v={payForm.mode} on={(v) => setPayForm({ ...payForm, mode: v })} />
             <F label="Date of payment" type="date" v={payForm.date} on={(v) => setPayForm({ ...payForm, date: v })} />
             <F label="Account received in" v={payForm.account} on={(v) => setPayForm({ ...payForm, account: v })} />
-            <F label="Amount (₹)" type="number" v={payForm.amount} on={(v) => setPayForm({ ...payForm, amount: v })} />
+            <F label="Amount (₹)" v={payForm.amount} on={(v) => setPayForm({ ...payForm, amount: v })} />
             <DialogFooter className="sm:col-span-2">
               <Button type="button" variant="ghost" onClick={() => setPayOpenFor(null)}>Cancel</Button>
               <Button type="submit">Save payment</Button>
